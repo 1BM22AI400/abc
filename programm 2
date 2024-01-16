@@ -1,32 +1,46 @@
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error as mse
-from sklearn.preprocessing import LabelEncoder
 
-data=pd.read_csv("/content/Iris.csv")
-x=data.iloc[:,1:-1]
-y=data.iloc[:,-1]
-enc=LabelEncoder()
-y=enc.fit_transform(y)
-errors=[]
-set=[]
-x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.2,random_state=43)
-features=x.columns
-featureselected=[]
-i=0
-for feature in features:
-  i=i+1
-  featureselected.append(feature)
-  x_train_subset=x_train[featureselected]
-  x_test_subset=x_test[featureselected]
-  model=LinearRegression()
-  model.fit(x_train_subset,y_train)
-  predictions=model.predict(x_test_subset)
-  error=mse(y_test,predictions)
-  print(f"Iteration={i},Features={np.array(x_train_subset.columns)},error={error}")
-  set.append(x_train_subset.columns)
-  errors.append(error)
-min_error=np.argmin(errors)
-print(f"best subset={np.array(set[min_error])}")
+data = pd.read_csv("enjoysport.csv")
+concepts = np.array(data.iloc[:,0:-1])
+print("\nInstances are:\n",concepts)
+target = np.array(data.iloc[:,-1])
+print("\nTarget Values are: ",target)
+
+def learn(concepts, target):
+    specific_h = concepts[0].copy()
+    print("\nInitialization of specific_h and genearal_h")
+    print("\nSpecific Boundary: ", specific_h)
+    general_h = [["?" for i in range(len(specific_h))] for i in range(len(specific_h))]
+    print("\nGeneric Boundary: ",general_h)
+
+    for i, h in enumerate(concepts):
+        print("\nInstance", i+1 , "is ", h)
+        if target[i] == "yes":
+            print("Instance is Positive ")
+            for x in range(len(specific_h)):
+                if h[x]!= specific_h[x]:
+                    specific_h[x] ='?'
+                    general_h[x][x] ='?'
+
+        if target[i] == "no":
+            print("Instance is Negative ")
+            for x in range(len(specific_h)):
+                if h[x]!= specific_h[x]:
+                    general_h[x][x] = specific_h[x]
+                else:
+                    general_h[x][x] = '?'
+
+        print("Specific Bundary after ", i+1, "Instance is ", specific_h)
+        print("Generic Boundary after ", i+1, "Instance is ", general_h)
+        print("\n")
+
+    indices = [i for i, val in enumerate(general_h) if val == ['?', '?', '?', '?', '?', '?']]
+    for i in indices:
+        general_h.remove(['?', '?', '?', '?', '?', '?'])
+    return specific_h, general_h
+
+s_final, g_final = learn(concepts, target)
+
+print("Final Specific_h: ", s_final, sep="\n")
+print("Final General_h: ", g_final, sep="\n")
