@@ -1,29 +1,31 @@
-import numpy as np
-import matplotlib.pyplot as plt 
-from sympy import lambdify,symbols,diff
-x=symbols('x')
-y=x**2
-dy_dx=diff(y,x)
-func=lambdify(x,y,'numpy')
-derivative_func=lambdify(x,dy_dx,'numpy')
-x_values=np.linspace(-5,5,100)
-y_values=func(x_values)
-derivative_values=derivative_func(x_values)
-x_point=2
-y_point=func(x_point)
-slope=derivative_func(x_point)
-tangent_line=slope*(x-x_point)+y_point
-tangent_line_func=lambdify(x,tangent_line,'numpy')
-tangent_line_values=tangent_line_func(x_values)
+import csv
+a = []
+with open('enjoysport.csv', 'r') as csvfile:
+    next(csvfile)
+    for row in csv.reader(csvfile):
+        a.append(row)
+    print(a)
 
+print("\nThe total number of training instances are : ",len(a))
 
-plt.plot(x_values,y_values,label='original curve')
-plt.plot(x_values,tangent_line_values,label='tangent_line at x=2')
-plt.plot(x_values,derivative_values,label='Derivative')
-plt.scatter(x_point,y_point,color='red',label='point on curve')
-plt.legend()
-plt.title("curve,tangent, and Derivative")
-plt.xlabel("x")
-plt.ylabel("y")
-plt.grid(True)
-plt.show()
+num_attribute = len(a[0])-1
+
+print("\nThe initial hypothesis is : ")
+hypothesis = ['0']*num_attribute
+print(hypothesis)
+
+for i in range(0, len(a)):
+    if a[i][num_attribute] == 'yes':
+        print ("\nInstance ", i+1, "is", a[i], " and is Positive Instance")
+        for j in range(0, num_attribute):
+            if hypothesis[j] == '0' or hypothesis[j] == a[i][j]:
+                hypothesis[j] = a[i][j]
+            else:
+                hypothesis[j] = '?'
+        print("The hypothesis for the training instance", i+1, " is: " , hypothesis, "\n")
+
+    if a[i][num_attribute] == 'no':
+        print ("\nInstance ", i+1, "is", a[i], " and is Negative Instance Hence Ignored")
+        print("The hypothesis for the training instance", i+1, " is: " , hypothesis, "\n")
+
+print("\nThe Maximally specific hypothesis for the training instance is ", hypothesis)
